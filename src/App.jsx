@@ -5,6 +5,7 @@ import data from './data/data';
 function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedPriceRange, setSelectedPriceRange] = useState('all');
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -14,10 +15,19 @@ function App() {
     setSelectedCategory(event.target.value);
   };
 
+  const handlePriceRangeChange = (event) => {
+    setSelectedPriceRange(event.target.value);
+  };
+
   const filteredData = data.filter(item => {
     const titleMatch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
     const categoryMatch = selectedCategory === 'all' || item.category.toLowerCase() === selectedCategory.toLowerCase();
-    return titleMatch && categoryMatch;
+    const priceMatch = selectedPriceRange === 'all' ||
+      (selectedPriceRange === '$0-$50' && parseInt(item.newPrice) <= 50) ||
+      (selectedPriceRange === '$50-$100' && parseInt(item.newPrice) > 50 && parseInt(item.newPrice) <= 100) ||
+      (selectedPriceRange === '$100-$150' && parseInt(item.newPrice) > 100 && parseInt(item.newPrice) <= 150) ||
+      (selectedPriceRange === 'over $150' && parseInt(item.newPrice) > 150);
+    return titleMatch && categoryMatch && priceMatch;
   });
 
   return (
@@ -77,6 +87,55 @@ function App() {
           Heels
         </label>
       </div>
+
+      <div>
+        <label>
+          <input
+            type="radio"
+            value="all"
+            checked={selectedPriceRange === 'all'}
+            onChange={handlePriceRangeChange}
+          />
+          All
+        </label>
+        <label>
+          <input
+            type="radio"
+            value="$0-$50"
+            checked={selectedPriceRange === '$0-$50'}
+            onChange={handlePriceRangeChange}
+          />
+          $0-$50
+        </label>
+        <label>
+          <input
+            type="radio"
+            value="$50-$100"
+            checked={selectedPriceRange === '$50-$100'}
+            onChange={handlePriceRangeChange}
+          />
+          $50-$100
+        </label>
+        <label>
+          <input
+            type="radio"
+            value="$100-$150"
+            checked={selectedPriceRange === '$100-$150'}
+            onChange={handlePriceRangeChange}
+          />
+          $100-$150
+        </label>
+        <label>
+          <input
+            type="radio"
+            value="over $150"
+            checked={selectedPriceRange === 'over $150'}
+            onChange={handlePriceRangeChange}
+          />
+          over $150
+        </label>
+      </div>
+      
       <div className="card-container">
         {filteredData.map((item, index) => (
           <div key={index} className="card">
